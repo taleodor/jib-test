@@ -14,11 +14,6 @@ spec:
     command:
     - cat
     tty: true
-  - name: busybox
-    image: busybox
-    command:
-    - cat
-    tty: true
 """
     }
   }
@@ -26,10 +21,7 @@ spec:
     stage('Run maven') {
       steps {
         container('maven') {
-          sh 'mvn -version'
-        }
-        container('busybox') {
-          sh '/bin/busybox'
+          sh 'mvn clean compile jib:dockerBuild'
         }
       }
     }
