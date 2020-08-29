@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
   - name: maven
-    image: maven:3.6.3-openjdk-14
+    image: docker:19.03.12-dind
     command:
     - cat
     tty: true
@@ -21,6 +21,8 @@ spec:
     stage('Run maven') {
       steps {
         container('maven') {
+          sh 'apk add openjdk11'
+          sh 'apk add maven'
           sh 'mvn clean compile jib:dockerBuild'
         }
       }
