@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
   - name: maven
-    image: maven:alpine
+    image: maven:3.6.3-openjdk-14
     command:
     - cat
     tty: true
