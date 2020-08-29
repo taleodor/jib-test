@@ -13,7 +13,15 @@ spec:
     image: docker:19.03.12-dind
     command:
     - cat
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: dockersock
     tty: true
+  volumes:
+  - name: dockersock
+    hostPath:
+      path: /var/run/docker.sock
+      type: File
 """
     }
   }
