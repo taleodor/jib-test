@@ -55,9 +55,11 @@ spec:
         RELIZA_VER = "${RELIZA_VER}"
       }
       steps {
-        script {
-            RELIZA_FULL_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".version"', returnStdout: true).trim()
-            RELIZA_SHORT_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".dockerTagSafeVersion"', returnStdout: true).trim()
+        container('maven') {
+            script {
+                RELIZA_FULL_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".version"', returnStdout: true).trim()
+                RELIZA_SHORT_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".dockerTagSafeVersion"', returnStdout: true).trim()
+            }
         }
       }
     }
