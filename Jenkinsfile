@@ -36,8 +36,8 @@ spec:
             sh 'full_ver=$(echo $RLZ_VER_JSON | docker run --rm relizaio/jq -r ".version")'
             // version without meta for docker registry, since plus sign is not allowed there
             sh 'short_ver=$(echo $RLZ_VER_JSON | docker run --rm relizaio/jq -r ".dockerTagSafeVersion")'
-            sh '$full_ver'
-            sh '$short_ver'
+            sh 'echo $full_ver'
+            sh 'echo $short_ver'
             
         //  sh 'apk add openjdk11'
         //  sh 'apk add maven'
