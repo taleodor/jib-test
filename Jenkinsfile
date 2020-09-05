@@ -1,3 +1,4 @@
+BUILD_START_TIME="0"
 RELIZA_VER="0"
 RELIZA_FULL_VER="0"
 RELIZA_SHORT_VER="0"
@@ -30,6 +31,13 @@ spec:
     }
   }
   stages {
+    stage('Record Start Time') {
+        steps {
+            script {
+                BUILD_START_TIME = sh(script: 'date -Iseconds', returnStdout: true).trim()
+            }
+        }
+    }
     stage('Run maven') {
       steps {
         echo "Reliza Base Ver = ${RELIZA_VER}"
@@ -67,6 +75,15 @@ spec:
         steps {
             echo "Reliza Base Ver = ${RELIZA_VER}"
             echo "Reliza Full Ver = ${RELIZA_FULL_VER}, Reliza Short Ver = ${RELIZA_SHORT_VER}"
+        }
+    }
+    stage('Build Image') {
+        steps {
+            container('maven') {
+                sh 'apk add openjdk11'
+                sh 'apk add maven'
+                sh 'mvn clean compile jib:dockerBuild'
+            }
         }
     }
   }
