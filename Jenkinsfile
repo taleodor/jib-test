@@ -40,7 +40,6 @@ spec:
                     RELIZA_SHORT_VER = sh(script: 'echo $RELIZA_VER | docker run --rm relizaio/jq -r ".dockerTagSafeVersion"', returnStdout: true).trim()
                 }
             }
-            sh 'echo "reliza ver = $RELIZA_VER"'
             sh 'echo "reliza full ver = $RELIZA_FULL_VER"'
             sh 'echo "reliza short ver = $RELIZA_SHORT_VER"'
             
@@ -49,6 +48,11 @@ spec:
         //  sh 'mvn clean compile jib:dockerBuild'
         }
       }
+    }
+    stage('Echo Versions') {
+        steps {
+            echo "Reliza Full Ver = ${RELIZA_FULL_VER}, Reliza Short Ver = ${RELIZA_SHORT_VER}"
+        }
     }
   }
 }
