@@ -39,8 +39,6 @@ spec:
                 script {
                     RELIZA_VER = sh(script: 'docker run --rm relizaio/reliza-go-client -u https://test.relizahub.com getversion -k $RELIZA_API_KEY -i $RELIZA_API_ID -b $GIT_BRANCH --metadata Jenkins --project ebc33386-81e1-42a4-8c69-223b013862a9', returnStdout: true).trim()
                     sh 'echo Reliza Ver in Middle = $RELIZA_VER'
-                    RELIZA_FULL_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".version"', returnStdout: true).trim()
-                    RELIZA_SHORT_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".dockerTagSafeVersion"', returnStdout: true).trim()
                 }
             }
             // sh 'echo "reliza full ver = $RELIZA_FULL_VER"'
@@ -49,6 +47,17 @@ spec:
         //  sh 'apk add openjdk11'
         //  sh 'apk add maven'
         //  sh 'mvn clean compile jib:dockerBuild'
+        }
+      }
+    }
+    stage ('Extract Short and Full Versions') {
+      environment {
+        RELIZA_VER = "${RELIZA_VER}"
+      }
+      steps {
+        script {
+            RELIZA_FULL_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".version"', returnStdout: true).trim()
+            RELIZA_SHORT_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".dockerTagSafeVersion"', returnStdout: true).trim()
         }
       }
     }
