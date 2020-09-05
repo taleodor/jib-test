@@ -38,6 +38,7 @@ spec:
             withCredentials([usernamePassword(credentialsId: 'da8b0f12-0431-4939-9888-3481b95ab7d1', usernameVariable: 'RELIZA_API_ID', passwordVariable: 'RELIZA_API_KEY')]) {
                 script {
                     RELIZA_VER = sh(script: 'docker run --rm relizaio/reliza-go-client -u https://test.relizahub.com getversion -k $RELIZA_API_KEY -i $RELIZA_API_ID -b $GIT_BRANCH --metadata Jenkins --project ebc33386-81e1-42a4-8c69-223b013862a9', returnStdout: true).trim()
+                    sh 'echo Reliza Ver in Middle = $RELIZA_VER'
                     RELIZA_FULL_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".version"', returnStdout: true).trim()
                     RELIZA_SHORT_VER = sh(script: 'echo $RELIZA_VER | docker run -i --rm relizaio/jq -r ".dockerTagSafeVersion"', returnStdout: true).trim()
                 }
