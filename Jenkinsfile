@@ -32,6 +32,7 @@ spec:
   stages {
     stage('Run maven') {
       steps {
+        echo "Reliza Full Ver = ${relizaFullVer}, Reliza Short Ver = ${relizaShortVer}"
         container('maven') {
             withCredentials([usernamePassword(credentialsId: 'da8b0f12-0431-4939-9888-3481b95ab7d1', usernameVariable: 'RELIZA_API_ID', passwordVariable: 'RELIZA_API_KEY')]) {
                 script {
