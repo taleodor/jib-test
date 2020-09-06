@@ -81,20 +81,45 @@ spec:
         }
     }
     stage('Build Image') {
+        environment {
+            BUILD_START="${BUILD_START_TIME}"
+            RELIZA_FULL_VER="${RELIZA_FULL_VER}"
+        }
         steps {
             container('maven') {
-                // sh 'docker ps'
-                // sh 'docker run -dp 5000:5000 --restart=always --name registry registry'
-                // sh 'docker pull localhost:5000/hw'
-                // sh 'docker ps'
                 withCredentials([usernamePassword(credentialsId: 'aws', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '$(docker run --rm -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY relizaio/awscli ecr get-login --no-include-email --region us-west-1)'
                 }
                 sh 'apk add openjdk11'
                 sh 'apk add maven'
                 sh 'mvn clean compile jib:build'
-                sh 'cat target/jib-image.digest'
-                sh 'cat target/jib-image.id'
+                
+                // construct reliza command
+                sh '''
+                    echo -n "-u https://test.relizahub.com " > reliza_command
+                    echo -n "-k $RELIZA_API_KEY -i $RELIZA_API_ID -b $GIT_BRANCH " >> reliza_command
+                    echo -n "--vcstype git --vcsuri $GIT_URL " >> reliza_command
+                    echo -n "--date $(git log -1 --date=iso-strict --pretty='%ad') " >> reliza_command
+                    echo -n "-v $RELIZA_FULL_VER " >> reliza_command
+                    echo -n "metadata Jenkins " >> reliza_command
+                    echo -n "--project ebc33386-81e1-42a4-8c69-223b013862a9 " >> reliza_command
+                    image_id=$(cat target/jib-image.id)
+                    echo -n "--artid $(docker image ls --no-trunc | grep $image_id | awk 'NR==1 { print $1 }') " >> reliza_command
+                    echo -n "--artbuildid $BUILD_NUMBER " >> reliza_command
+                    echo -n "--artcimeta Jenkins $BUILD_URL" >> reliza_command
+                    echo -n "--arttype Docker " >> reliza_command
+                    DOCKER_SHA_256=$(cat target/jib-image.digest)
+                    if [ $DOCKER_SHA_256 != "" ]
+                    then
+                        echo -n "--artdigests $DOCKER_SHA_256 " >> reliza_command
+                    fi
+                    echo -n "--datestart $BUILD_START " >> reliza_command
+                    echo -n "--dateend $(date -Iseconds) " >> reliza_command
+                    cat reliza_command
+                    docker run --rm relizaio/reliza-go-client addrelease $(cat reliza_command)
+                '''
+                // display digest of pushed build
+                // sh 'cat target/jib-image.digest'
             }
         }
     }
