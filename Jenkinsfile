@@ -93,6 +93,8 @@ spec:
                 sh 'apk add openjdk11'
                 sh 'apk add maven'
                 sh 'mvn clean compile jib:build'
+                sh 'cat target/jib-image.digest'
+                sh 'cat target/jib-image.id'
             }
         }
     }
