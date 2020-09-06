@@ -84,6 +84,7 @@ spec:
         environment {
             BUILD_START="${BUILD_START_TIME}"
             RELIZA_FULL_VER="${RELIZA_FULL_VER}"
+            RELIZA_API_SECRET=credentials('da8b0f12-0431-4939-9888-3481b95ab7d1')
         }
         steps {
             container('maven') {
@@ -97,11 +98,11 @@ spec:
                 // construct reliza command
                 sh '''
                     echo -n "-u https://test.relizahub.com " > reliza_command
-                    echo -n "-k $RELIZA_API_KEY -i $RELIZA_API_ID -b $GIT_BRANCH " >> reliza_command
+                    echo -n "-k $RELIZA_API_SECRET_PWD -i $RELIZA_API_ID_USR -b $GIT_BRANCH " >> reliza_command
                     echo -n "--vcstype git --vcsuri $GIT_URL " >> reliza_command
                     echo -n "--date $(git log -1 --date=iso-strict --pretty='%ad') " >> reliza_command
                     echo -n "-v $RELIZA_FULL_VER " >> reliza_command
-                    echo -n "metadata Jenkins " >> reliza_command
+                    echo -n "--metadata Jenkins " >> reliza_command
                     echo -n "--project ebc33386-81e1-42a4-8c69-223b013862a9 " >> reliza_command
                     image_id=$(cat target/jib-image.id)
                     echo -n "--artid $(docker image ls --no-trunc | grep $image_id | awk 'NR==1 { print $1 }') " >> reliza_command
