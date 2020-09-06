@@ -102,7 +102,6 @@ spec:
                     echo -n "--vcstype git --vcsuri $GIT_URL " >> reliza_command
                     echo -n "--date $(git log -1 --date=iso-strict --pretty='%ad') " >> reliza_command
                     echo -n "-v $RELIZA_FULL_VER " >> reliza_command
-                    echo -n "--metadata Jenkins " >> reliza_command
                     echo -n "--project ebc33386-81e1-42a4-8c69-223b013862a9 " >> reliza_command
                     image_id=$(cat target/jib-image.id)
                     echo -n "--artid $(docker image ls --no-trunc | grep $image_id | awk 'NR==1 { print $1 }') " >> reliza_command
