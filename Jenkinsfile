@@ -52,12 +52,6 @@ spec:
                     sh 'echo Reliza Ver in Middle = $RELIZA_VER'
                 }
             }
-            // sh 'echo "reliza full ver = $RELIZA_FULL_VER"'
-            // sh 'echo "reliza short ver = $RELIZA_SHORT_VER"'
-            
-        //  sh 'apk add openjdk11'
-        //  sh 'apk add maven'
-        //  sh 'mvn clean compile jib:dockerBuild'
         }
       }
     }
@@ -101,11 +95,12 @@ spec:
                     }
                 }
                 sh 'apk add git'
-                sh 'git log -3'
                 sh '''
                     echo -n "-u https://test.relizahub.com " >> reliza_command
                     echo -n "-b $GIT_BRANCH " >> reliza_command
-                    echo -n "--vcstype git --vcsuri $GIT_URL " >> reliza_command
+                    echo -n "--vcstype git " >> reliza_command
+                    echo -n "--vcsuri $GIT_URL " >> reliza_command
+                    echo -n "--commit $GIT_COMMIT " >> reliza_command
                     echo -n "--date $(git log -1 --date=iso-strict --pretty='%ad') " >> reliza_command
                     echo -n "-v $RELIZA_FULL_VER " >> reliza_command
                     echo -n "--project ebc33386-81e1-42a4-8c69-223b013862a9 " >> reliza_command
