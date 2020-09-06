@@ -30,9 +30,9 @@ spec:
 """
     }
   }
-  options {
-    withAWS(credentials:'aws')
-  }
+  // options {
+  //  withAWS(credentials:'aws')
+  // }
   stages {
     stage('Record Start Time') {
         steps {
@@ -87,6 +87,9 @@ spec:
                 // sh 'docker run -dp 5000:5000 --restart=always --name registry registry'
                 // sh 'docker pull localhost:5000/hw'
                 // sh 'docker ps'
+                withCredentials([usernamePassword(credentialsId: 'aws', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '$(docker run --rm -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY relizaio/awscli ecr get-login --no-include-email --region us-west-1)'
+                }
                 sh 'apk add openjdk11'
                 sh 'apk add maven'
                 sh 'mvn clean compile jib:build'
