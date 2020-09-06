@@ -30,6 +30,9 @@ spec:
 """
     }
   }
+  options {
+    withAWS(credentials:'aws')
+  }
   stages {
     stage('Record Start Time') {
         steps {
@@ -86,7 +89,7 @@ spec:
                 // sh 'docker ps'
                 sh 'apk add openjdk11'
                 sh 'apk add maven'
-                sh 'mvn clean compile jib:build -Djib.allowInsecureRegistries=true'
+                sh 'mvn clean compile jib:build'
             }
         }
     }
