@@ -82,7 +82,7 @@ spec:
             container('maven') {
                 sh 'apk add openjdk11'
                 sh 'apk add maven'
-                sh 'mvn clean compile jib:dockerBuild'
+                sh 'mvn clean compile jib:build'
             }
         }
     }
