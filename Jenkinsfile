@@ -80,13 +80,13 @@ spec:
     stage('Build Image') {
         steps {
             container('maven') {
-                sh 'docker ps'
+                // sh 'docker ps'
                 // sh 'docker run -dp 5000:5000 --restart=always --name registry registry'
-                sh 'docker pull localhost:5000/hw'
-                sh 'docker ps'
+                // sh 'docker pull localhost:5000/hw'
+                // sh 'docker ps'
                 sh 'apk add openjdk11'
                 sh 'apk add maven'
-                sh 'mvn clean compile jib:build'
+                sh 'mvn clean compile jib:build -Djib.allowInsecureRegistries=true'
             }
         }
     }
