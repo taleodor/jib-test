@@ -84,7 +84,6 @@ spec:
         environment {
             BUILD_START="${BUILD_START_TIME}"
             RELIZA_FULL_VER="${RELIZA_FULL_VER}"
-            RELIZA_API_SECRET=credentials('da8b0f12-0431-4939-9888-3481b95ab7d1')
         }
         steps {
             container('maven') {
@@ -96,9 +95,14 @@ spec:
                 sh 'mvn clean compile jib:build'
                 
                 // construct reliza command
+                withCredentials([usernamePassword(credentialsId: 'da8b0f12-0431-4939-9888-3481b95ab7d1', usernameVariable: 'RELIZA_API_ID', passwordVariable: 'RELIZA_API_KEY')]) {
+                    script {
+                        sh 'echo -n "-k $RELIZA_API_KEY -i $RELIZA_API_ID " > reliza_command'
+                    }
+                }
                 sh '''
-                    echo -n "-u https://test.relizahub.com " > reliza_command
-                    echo -n "-k $RELIZA_API_SECRET_PWD -i $RELIZA_API_ID_USR -b $GIT_BRANCH " >> reliza_command
+                    echo -n "-u https://test.relizahub.com " >> reliza_command
+                    echo -n "-b $GIT_BRANCH " >> reliza_command
                     echo -n "--vcstype git --vcsuri $GIT_URL " >> reliza_command
                     echo -n "--date $(git log -1 --date=iso-strict --pretty='%ad') " >> reliza_command
                     echo -n "-v $RELIZA_FULL_VER " >> reliza_command
