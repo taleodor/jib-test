@@ -112,7 +112,7 @@ spec:
                     image_id=$(cat target/jib-image.id)
                     echo -n "--artid $(docker image ls --no-trunc | grep $image_id | awk 'NR==1 { print $1 }') " >> reliza_command
                     echo -n "--artbuildid $BUILD_NUMBER " >> reliza_command
-                    echo -n "--artcimeta Jenkins $BUILD_URL" >> reliza_command
+                    echo -n "--artcimeta Jenkins $BUILD_URL " >> reliza_command
                     echo -n "--arttype Docker " >> reliza_command
                     DOCKER_SHA_256=$(cat target/jib-image.digest)
                     if [ $DOCKER_SHA_256 != "" ]
