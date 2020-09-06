@@ -100,6 +100,7 @@ spec:
                         sh 'echo -n "-k $RELIZA_API_KEY -i $RELIZA_API_ID " > reliza_command'
                     }
                 }
+                sh 'apk add git'
                 sh 'git log -3'
                 sh '''
                     echo -n "-u https://test.relizahub.com " >> reliza_command
