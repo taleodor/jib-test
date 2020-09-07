@@ -78,29 +78,19 @@ spec:
         }
         steps {
             container('maven') {
+                // initialize reliza command
+                sh 'echo -n "-v $RELIZA_FULL_VER " > reliza_command'
+                
                 withCredentials([usernamePassword(credentialsId: 'aws', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '$(docker run --rm -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY relizaio/awscli ecr get-login --no-include-email --region us-west-1)'
                 }
                 sh 'apk add openjdk11'
                 sh 'apk add maven'
                 sh 'mvn clean compile jib:build'
-                
-                // construct reliza command
-                withCredentials([usernamePassword(credentialsId: 'da8b0f12-0431-4939-9888-3481b95ab7d1', usernameVariable: 'RELIZA_API_ID', passwordVariable: 'RELIZA_API_KEY')]) {
-                    script {
-                        sh 'echo -n "-k $RELIZA_API_KEY -i $RELIZA_API_ID " > reliza_command'
-                    }
-                }
                 sh 'apk add git'
+                
+                // construct reliza command on build success
                 sh '''
-                    echo -n "-u https://test.relizahub.com " >> reliza_command
-                    echo -n "-b $GIT_BRANCH " >> reliza_command
-                    echo -n "--vcstype git " >> reliza_command
-                    echo -n "--vcsuri $GIT_URL " >> reliza_command
-                    echo -n "--commit $GIT_COMMIT " >> reliza_command
-                    echo -n "--date $(git log -1 --date=iso-strict --pretty='%ad') " >> reliza_command
-                    echo -n "-v $RELIZA_FULL_VER " >> reliza_command
-                    echo -n "--project ebc33386-81e1-42a4-8c69-223b013862a9 " >> reliza_command
                     image_id=$(cat target/jib-image.id)
                     echo -n "--artid $(docker image ls --no-trunc | grep $image_id | awk 'NR==1 { print $1 }') " >> reliza_command
                     echo -n "--artbuildid $BUILD_NUMBER " >> reliza_command
@@ -113,18 +103,38 @@ spec:
                     fi
                     echo -n "--datestart $BUILD_START " >> reliza_command
                     echo -n "--dateend $(date -Iseconds) " >> reliza_command
-                    # cat reliza_command
-                    docker run --rm relizaio/reliza-go-client addrelease $(cat reliza_command)
                 '''
             }
         }
     }
   }
-  post { 
+  post {
     always {
         container('maven') {
-            echo 'Post build'
-            sh 'cat reliza_command'
+                withCredentials([usernamePassword(credentialsId: 'da8b0f12-0431-4939-9888-3481b95ab7d1', usernameVariable: 'RELIZA_API_ID', passwordVariable: 'RELIZA_API_KEY')]) {
+                    script {
+                        sh 'echo -n "-k $RELIZA_API_KEY -i $RELIZA_API_ID " >> reliza_command'
+                    }
+                }
+            sh '''
+                echo -n "-u https://test.relizahub.com " >> reliza_command
+                echo -n "-b $GIT_BRANCH " >> reliza_command
+                echo -n "--vcstype git " >> reliza_command
+                echo -n "--vcsuri $GIT_URL " >> reliza_command
+                echo -n "--commit $GIT_COMMIT " >> reliza_command
+                echo -n "--date $(git log -1 --date=iso-strict --pretty='%ad') " >> reliza_command
+                echo -n "--project ebc33386-81e1-42a4-8c69-223b013862a9 " >> reliza_command
+            '''
+        }
+    }
+    success {
+        container('maven') {
+            sh 'docker run --rm relizaio/reliza-go-client addrelease $(cat reliza_command)'
+        }
+    }
+    failure {
+        container('maven') {
+            sh 'docker run --rm relizaio/reliza-go-client addrelease --status completed $(cat reliza_command)'
         }
     }
   }
