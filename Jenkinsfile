@@ -30,9 +30,6 @@ spec:
 """
     }
   }
-  // options {
-  //  withAWS(credentials:'aws')
-  // }
   stages {
     stage('Record Start Time') {
         steps {
@@ -116,12 +113,18 @@ spec:
                     fi
                     echo -n "--datestart $BUILD_START " >> reliza_command
                     echo -n "--dateend $(date -Iseconds) " >> reliza_command
-                    cat reliza_command
+                    # cat reliza_command
                     docker run --rm relizaio/reliza-go-client addrelease $(cat reliza_command)
                 '''
-                // display digest of pushed build
-                // sh 'cat target/jib-image.digest'
             }
+        }
+    }
+  }
+  post { 
+    always {
+        container('maven') {
+            echo 'Post build'
+            sh 'cat reliza_command'
         }
     }
   }
