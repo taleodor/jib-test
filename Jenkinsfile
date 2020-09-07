@@ -135,7 +135,7 @@ spec:
     }
     failure {
         container('maven') {
-            sh 'docker run --rm relizaio/reliza-go-client addrelease --status completed $(cat reliza_command)'
+            sh 'docker run --rm relizaio/reliza-go-client addrelease --status rejected $(cat reliza_command)'
         }
     }
   }
