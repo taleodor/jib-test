@@ -84,6 +84,7 @@ spec:
                 withCredentials([usernamePassword(credentialsId: 'aws', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '$(docker run --rm -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY relizaio/awscli ecr get-login --no-include-email --region us-west-1)'
                 }
+                sh 'exit 1'
                 sh 'apk add openjdk11'
                 sh 'apk add maven'
                 sh 'mvn clean compile jib:build'
